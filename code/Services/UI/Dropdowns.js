@@ -5,7 +5,7 @@ const setDropdown = (color, rule, cell, value = null) => {
   cell.setBackground(color);
 };
 
-export const successDropdown = (values, cell, initial) => {  
+export const successDropdown = (values, cell, initial) => {
   if(values.length > 1) {
     const rule = SpreadsheetApp
       .newDataValidation()

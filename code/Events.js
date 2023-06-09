@@ -1,4 +1,4 @@
-import { onApplyClick, onColorDropdown, onProductDropdown } from './EventHandlers.js';
+import { onApplyClick, onColorDropdown, onCountStatistics, onProductDropdown } from './EventHandlers.js';
 
 export const event = {
   range: EVENT.range,
@@ -13,7 +13,7 @@ export const event = {
 export const statEvents = [
   {
     coords: [18, 10],
-    listener: null,
+    listener: onCountStatistics,
   },
 ];
 

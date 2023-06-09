@@ -1,9 +1,10 @@
-import { event, statEvents, ordersEvents } from "./Events.js";
+import { event, statEvents, ordersEvents } from './Events.js';
+import { compareStrings } from './Services/Util';
 
 switch (event.sheet) {
   case 'Статистика':
     statEvents
-      .find((ev) => ev.coords === event.coords)
+      .find((ev) => compareStrings(`${ev.coords}`, `${event.coords}`))
       .listener();
     break;
 

@@ -1,10 +1,10 @@
-import { 
-  sheets, 
+import {
+  sheets,
   spreadsheet,
-  COLORS_TOTAL,
   COLOR_NAMES,
   COLOR_START_POS,
-} from "../Global.js";
+  CLOTHES_COLORS,
+} from '../Global.js';
 
 import { compareStrings } from './Util.js';
 
@@ -37,6 +37,7 @@ export const getColorAmountCell = (rowIndex, sheet, colorName) => {
   let amountCell = null;
 
   switch (colorName) {
+    case 'Основной':
     case 'Золото':
       amountCell = sheet.getRange(rowIndex, 3);
       break;
@@ -63,16 +64,17 @@ export const getCategory = (productName) => {
 
 export const getColors = (productName, category) => {
   let colors = [];
-  
+  const COLORS_BY_CATEGORY = category === 'Одежда' ? CLOTHES_COLORS : COLOR_NAMES;
+
   const row = spreadsheet
     .getSheetByName(category)
     .getRange("B3:E")
     .getValues()
     .find(([name]) => compareStrings(productName, name));
 
-  row.slice(COLOR_START_POS, COLOR_START_POS + COLORS_TOTAL)
+  row.slice(COLOR_START_POS, COLOR_START_POS + COLORS_BY_CATEGORY.length)
     .forEach((amount, index) => {
-      if (amount > 0) colors.push(COLOR_NAMES[index]);
+      if (amount > 0) colors.push(COLORS_BY_CATEGORY[index]);
     });
 
   if (!colors.length) throw new Error('Нет в наличии');
@@ -80,8 +82,8 @@ export const getColors = (productName, category) => {
   return colors;
 };
 
-export const getTotalAmount = (sheet, row) => {
-  return sheet.getRange(row, 6).getValue();
+export const getTotalAmount = (sheet, row, categoryName) => {
+  return sheet.getRange(row, categoryName === 'Одежда' ? 4 : 6).getValue();
 };
 
 export const decreaseProductAmount = (productName, colorName, category) => {
@@ -97,7 +99,7 @@ export const decreaseProductAmount = (productName, colorName, category) => {
 
   amountCell.setValue(amount - 1);
 
-  const totalAmount = getTotalAmount(categorySheet, amountCell.getRow());
+  const totalAmount = getTotalAmount(categorySheet, amountCell.getRow(), category);
   
   if (totalAmount <= 0) deleteProduct(productName);
 };
@@ -120,11 +122,38 @@ export const writeToOrderInfo = (infoCell, text) => {
 };
 
 export const writeToSoldSheet = (text) => {
-  const soldSheet = spreadsheet.getSheetByName('Продано');
+  const soldSheet = sheets['Продано'];
   const soldSheetLeng = soldSheet.getRange('A1:A').getValues().filter(String).length;
   const lastCell = soldSheet.getRange(soldSheetLeng + 1, 1);
 
   lastCell.setValue(text);
+};
+
+export const getSoldStatistics = () => {
+  const soldSheet = sheets['Продано'];
+  const soldItemsList = soldSheet.getRange('A1:A').getValues().filter(String).map(item => item[0].trim());
+  const stat = {};
+
+  soldItemsList.forEach(soldItem => {
+    if (stat.hasOwnProperty(soldItem)) {
+      stat[soldItem] = stat[soldItem] + 1;
+    } else {
+      stat[soldItem] = 1;
+    }
+  });
+
+  return Object.keys(stat)
+    .map(statisticItem => ([statisticItem, stat[statisticItem]]))
+    .sort((prevItem, nextItem) => {
+      if (prevItem[1] > nextItem[1]) {
+        return -1;
+      } else if (prevItem[1] < nextItem[1]) {
+        return 1;
+      } else {
+        return 0;
+      }
+    })
+    .slice(0, 10);
 };
 
 export const writeProductReport = (infoCell, productName, colorName) => {

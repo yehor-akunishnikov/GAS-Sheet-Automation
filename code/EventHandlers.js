@@ -1,10 +1,11 @@
 import { event } from './Events.js';
 
-import { 
-  decreaseProductAmount, 
-  getCategory, 
-  getColors, 
-  getOrdersCoords, 
+import {
+  decreaseProductAmount,
+  getSoldStatistics,
+  getCategory,
+  getColors,
+  getOrdersCoords,
   writeProductReport
 } from './Services/Main.js';
 
@@ -19,6 +20,7 @@ import {
 import { clearApply, resetSelection } from './Services/UI/reset.js';
 
 import { isButtonValid, isColorValid, isProductValid } from './Services/Validation.js';
+import { sheets } from './Global';
 
 
 export const onProductDropdown = () => {
@@ -66,14 +68,14 @@ export const onColorDropdown = () => {
 
 export const onApplyClick = () => {
   setApplyPending(event.range);
-  
+
   const [ rowIndex ] = event.coords;
   const { 
     color: colorCell, 
     product: productCell,
     info: infoCell,
   } = getOrdersCoords(rowIndex, 'color', 'product', 'info');
-  
+
   const colorName = colorCell.getValue();
   const productName = productCell.getValue();
 
@@ -85,7 +87,7 @@ export const onApplyClick = () => {
     );
     return false
   }
-  
+
   const category = getCategory(productName);
 
   decreaseProductAmount(productName, colorName, category);
@@ -95,4 +97,12 @@ export const onApplyClick = () => {
     colorCell,
     event.range,
   );
+};
+
+export const onCountStatistics = () => {
+  const soldValues = getSoldStatistics();
+
+  sheets['Статистика'].getRange(`H7:I${7+soldValues.length - 1}`).setValues(soldValues);
+
+  event.range.setValue('FALSE');
 };
