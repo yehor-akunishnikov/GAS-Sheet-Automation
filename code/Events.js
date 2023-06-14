@@ -19,15 +19,15 @@ export const statEvents = [
 
 export const ordersEvents = [
   {
-    col: 9,
+    col: 6,
     listener: onProductDropdown,
   },
   {
-    col: 10,
+    col: 7,
     listener: onColorDropdown,
   },
   {
-    col: 11,
+    col: 8,
     listener: onApplyClick,
   },
 ];

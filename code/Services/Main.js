@@ -15,16 +15,16 @@ export const getOrdersCoords = (rowIndex, ...requiredCoords) => {
   requiredCoords.forEach(name => {
     switch (name) {
       case 'info':
-        coords.info = sheet.getRange(rowIndex, 7);
+        coords.info = sheet.getRange(rowIndex, 5);
         break;
       case 'product':
-        coords.product = sheet.getRange(rowIndex, 9);
+        coords.product = sheet.getRange(rowIndex, 6);
         break;
       case 'color':
-        coords.color = sheet.getRange(rowIndex, 10);
+        coords.color = sheet.getRange(rowIndex, 7);
         break;
       case 'apply':
-        coords.apply = sheet.getRange(rowIndex, 11);
+        coords.apply = sheet.getRange(rowIndex, 8);
         break;
       default: break;
     }
@@ -142,7 +142,7 @@ export const getSoldStatistics = () => {
     }
   });
 
-  return Object.keys(stat)
+  const statRange = Object.keys(stat)
     .map(statisticItem => ([statisticItem, stat[statisticItem]]))
     .sort((prevItem, nextItem) => {
       if (prevItem[1] > nextItem[1]) {
@@ -154,6 +154,8 @@ export const getSoldStatistics = () => {
       }
     })
     .slice(0, 10);
+
+  return [...statRange, ...Array.from(new Array(10 - statRange.length),()=> ['', ''])];
 };
 
 export const writeProductReport = (infoCell, productName, colorName) => {
